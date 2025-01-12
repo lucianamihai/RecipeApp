@@ -15,6 +15,19 @@ import com.example.flavormix.repository.UserFavoriteMealRepository
 import com.example.flavormix.viewModel.HomeViewModel
 import com.example.flavormix.viewModel.HomeViewModelFactory
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.os.Build
+import com.example.flavormix.NotificationReceiver
+import java.util.Calendar
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import android.widget.Toast
+
+import android.Manifest
+import android.content.pm.PackageManager
+import com.example.flavormix.AlarmScheduler
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -30,7 +43,13 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
     }
 
-
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            AlarmScheduler.scheduleNotifications(this)
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding =  ActivityMainBinding.inflate(layoutInflater)
@@ -51,5 +70,38 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+        checkAndRequestNotificationPermission()
+
     }
+
+    private fun checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13 și mai nou
+            when {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Permisiunea este deja acordată
+                    AlarmScheduler.scheduleNotifications(this)
+                }
+
+                shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) -> {
+                    Toast.makeText(
+                        this,
+                        "Această aplicație are nevoie de permisiunea pentru a trimite notificări.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+
+                else -> {
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+        } else {
+            AlarmScheduler.scheduleNotifications(this)
+        }
+    }
+
+
 }

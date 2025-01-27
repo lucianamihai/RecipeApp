@@ -17,11 +17,11 @@ object AlarmScheduler {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) { // Android 12+
             if (!alarmManager.canScheduleExactAlarms()) {
-//                Toast.makeText(
-//                    context,
-//                    "Permisiunea pentru alarme exacte nu este acordată. Notificările pot să nu funcționeze corect.",
-//                    Toast.LENGTH_LONG
-//                ).show()
+                Toast.makeText(
+                    context,
+                    "Permisiunea pentru alarme exacte nu este acordată. Notificările pot să nu funcționeze corect.",
+                    Toast.LENGTH_LONG
+                ).show()
 
                 /*
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
@@ -31,11 +31,11 @@ object AlarmScheduler {
         }
 
         val notificationTimes = listOf(
-            Pair(1, 0),
-            Pair(1, 38),
-            Pair(1, 47),
-            Pair(12, 30),
-            Pair(7, 0)
+            Pair(2, 56),
+            Pair(2, 57),
+            Pair(2, 58),
+            Pair(2, 59),
+            Pair(3, 0)
         )
 
         for ((hour, minute) in notificationTimes) {

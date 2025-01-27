@@ -42,12 +42,20 @@ class MainActivity : AppCompatActivity() {
         val homeViewModelFactory = HomeViewModelFactory(mealDatabase, userFavoriteMealRepository)
         ViewModelProvider(this, homeViewModelFactory)[HomeViewModel::class.java]
     }
-
+//PENTRU NOTIFICARI
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             AlarmScheduler.scheduleNotifications(this)
+        }
+        else {
+            // Permisiunea a fost refuzată
+            Toast.makeText(
+                this,
+                "Permisiunea pentru notificări a fost refuzată. Notificările nu vor funcționa.",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,10 +78,14 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
+        //PENTRU NOTIFICARI
         checkAndRequestNotificationPermission()
 
     }
 
+
+    //PENTRU NOTIFICARI
     private fun checkAndRequestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // Android 13 și mai nou
             when {
